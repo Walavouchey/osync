@@ -34,7 +34,6 @@ int main(int argc, char **argv)
         for (uint32_t ID : setsToExport)
             exportBeatmap(db, ID, lazerFolder, exportFolder);
         std::cout << "Done" << std::endl;
-
     }
     catch (exc e)
     {
