@@ -1,5 +1,7 @@
 #include <lazerdb.hpp>
 
+#include <sqlite3.h>
+
 #include <exc.hpp>
 
 #include <iostream>

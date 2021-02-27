@@ -1,11 +1,9 @@
 #pragma once
 
-#include <strext.hpp>
 
 #include <filesystem>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 class Config
 {

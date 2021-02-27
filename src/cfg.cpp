@@ -1,6 +1,7 @@
 #include <cfg.hpp>
 
 #include <exc.hpp>
+#include <strext.hpp>
 
 #include <fstream>
 #include <iostream>

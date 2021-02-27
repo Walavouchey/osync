@@ -1,7 +1,5 @@
 #pragma once
 
-#include <sqlite3.h>
-
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -26,5 +24,5 @@ private:
     static int ReceiveData(void *data, int cols, char **row, char **head);
     void HandleError();
 private:
-    sqlite3* db;
+    class sqlite3 *db;
 };
