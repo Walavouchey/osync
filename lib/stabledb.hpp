@@ -6,11 +6,12 @@
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
+#include <vector>
 
 class StableDB
 {
 public:
-    StableDB(const std::filesystem::path &stableFolder);
+    StableDB(const std::filesystem::path &stableDBFile, const std::filesystem::path &stableCCFile = "");
     std::unordered_set<uint32_t> GetBeatmapSetIDs() const;
 public:
     struct IntDoublePair { int8_t type1; int32_t value1; int8_t type2; double value2; };
@@ -94,6 +95,22 @@ private:
     };
     std::unique_ptr<Database> db;
 public:
+    struct Collection
+    {
+        Collection(std::ifstream &stream);
+        std::string Name;
+        uint32_t HashCount;
+        std::unordered_set<std::string> Hashes;
+    };
+private:
+    struct Collections
+    {
+        uint32_t Version;
+        uint32_t CollectionsCount;
+        std::vector<Collection> Collections;
+    };
+    std::unique_ptr<Collections> cc;
+public:
     struct BeatmapSet
     {
         uint32_t BeatmapSetID;
@@ -106,4 +123,6 @@ public:
         std::vector<Beatmap> Beatmaps;
     };
     std::unordered_map<uint32_t, BeatmapSet> GetBeatmapSets() const;
+    std::unordered_map<std::string, Beatmap> GetBeatmapsByHash() const;
+    std::vector<Collection> GetCollections() const;
 };

@@ -124,7 +124,20 @@ StableDB::Beatmap::Beatmap(std::ifstream &stream)
     #undef READ_STRING
 }
 
-StableDB::StableDB(const std::filesystem::path &stableDBFile)
+StableDB::Collection::Collection(std::ifstream &stream)
+{
+    
+    #define READ(out) stream.read(reinterpret_cast<char*>(&(out)), sizeof(out))
+    #define READ_STRING(out) out = ReadString(stream)
+    READ_STRING(Name);
+    READ(HashCount);
+    for (int i = 0; i < HashCount; i++)
+        Hashes.insert(ReadString(stream));
+    #undef READ
+    #undef READ_STRING
+}
+
+StableDB::StableDB(const std::filesystem::path &stableDBFile, const std::filesystem::path &stableCCFile)
 {
     db = std::make_unique<Database>();
     std::ifstream file(stableDBFile, std::ios::binary);
@@ -142,6 +155,16 @@ StableDB::StableDB(const std::filesystem::path &stableDBFile)
     READ(db->PermissionFlags);
     #undef READ
     #undef READ_STRING
+    if (stableCCFile.empty()) return;
+    cc = std::make_unique<Collections>();
+    std::ifstream ccFile(stableCCFile, std::ios::binary);
+    if (!ccFile.is_open()) throw E("Unable to open stable collections file: " + stableCCFile.string());
+    #define READ(out) ccFile.read(reinterpret_cast<char*>(&(out)), sizeof(out))
+    READ(cc->Version);
+    READ(cc->CollectionsCount);
+    for (int i = 0; i < cc->CollectionsCount; i++)
+        cc->Collections.emplace_back(Collection(ccFile));
+    #undef READ
 }
 
 std::unordered_set<uint32_t> StableDB::GetBeatmapSetIDs() const
@@ -164,4 +187,18 @@ std::unordered_map<uint32_t, StableDB::BeatmapSet> StableDB::GetBeatmapSets() co
         insertion.first->second.Beatmaps.push_back(bm);
     }
     return map;
+}
+
+std::unordered_map<std::string, StableDB::Beatmap> StableDB::GetBeatmapsByHash() const
+{
+    std::unordered_map<std::string, Beatmap> map;
+    for (const Beatmap &bm : db->Beatmaps)
+        map.insert({ bm.Hash, bm });
+    return map;
+}
+
+std::vector<StableDB::Collection> StableDB::GetCollections() const
+{
+    if (!cc) throw E("Collections not initialised");
+    return cc->Collections;
 }

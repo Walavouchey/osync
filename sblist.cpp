@@ -10,14 +10,19 @@
 #include <iostream>
 #include <unordered_set>
 
+std::string mdLink(std::string text, std::string link)
+{
+    return "[" + text + "](" + link + ")";
+}
+
 std::string reprMarkdown(StableDB::BeatmapSet set)
 {
-    return "[" + set.Artist + " - " + set.Title + "](https://osu.ppy.sh/beatmapsets/" + std::to_string(set.BeatmapSetID) + ")";
+    return mdLink(set.Artist + " - " + set.Title, "https://osu.ppy.sh/beatmapsets/" + std::to_string(set.BeatmapSetID));
 }
 
 std::string reprMarkdownUnicode(StableDB::BeatmapSet set)
 {
-    return "[" + set.ArtistUnicode + " - " + set.TitleUnicode + "](https://osu.ppy.sh/beatmapsets/" + std::to_string(set.BeatmapSetID) + ")";
+    return mdLink(set.ArtistUnicode + " - " + set.TitleUnicode, "https://osu.ppy.sh/beatmapsets/" + std::to_string(set.BeatmapSetID));
 }
 
 int main(int argc, char **argv)
