@@ -69,7 +69,7 @@ namespace sb
             case Section::Events:
             {
                 applyVariables(line, variables);
-                if (line.find("Sprite") == 0 || line.find("Animation") == 0 || line.find("Sample") == 0) return true;
+                if (line.find("Sprite") == 0 || line.find("Animation") == 0/* || line.find("Sample") == 0*/) return true;
             }
             break;
             case Section::Variables:
