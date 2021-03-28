@@ -5,13 +5,14 @@
 #include <memory>
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
 
 class StableDB
 {
 public:
     StableDB(const std::filesystem::path &stableFolder);
     std::unordered_set<uint32_t> GetBeatmapSetIDs() const;
-private:
+public:
     struct IntDoublePair { int8_t type1; int32_t value1; int8_t type2; double value2; };
     struct TimingPoint { double BPM; double Offset; bool Uninherited; };
     struct Beatmap
@@ -73,6 +74,7 @@ private:
         uint32_t LastModificationTime2;
         uint8_t SSMANIA;
     };
+private:
     static uint64_t ReadULEB128(std::ifstream &stream);
     static std::string ReadString(std::ifstream &stream);
     static void ReadBeatmap(std::ifstream &stream);
@@ -91,4 +93,17 @@ private:
         uint32_t PermissionFlags;
     };
     std::unique_ptr<Database> db;
+public:
+    struct BeatmapSet
+    {
+        uint32_t BeatmapSetID;
+        std::string Creator;
+        std::string FolderName;
+        std::string Artist;
+        std::string ArtistUnicode;
+        std::string Title;
+        std::string TitleUnicode;
+        std::vector<Beatmap> Beatmaps;
+    };
+    std::unordered_map<uint32_t, BeatmapSet> GetBeatmapSets() const;
 };

@@ -151,3 +151,17 @@ std::unordered_set<uint32_t> StableDB::GetBeatmapSetIDs() const
         map.insert(bm.BeatmapSetID);
     return map;
 }
+
+std::unordered_map<uint32_t, StableDB::BeatmapSet> StableDB::GetBeatmapSets() const
+{
+    std::unordered_map<uint32_t, BeatmapSet> map;
+    for (const Beatmap &bm : db->Beatmaps)
+    {
+        auto insertion = map.insert({ bm.BeatmapSetID, {
+            bm.BeatmapSetID, bm.Creator, bm.FolderName,
+            bm.Artist, bm.ArtistUnicode, bm.Title, bm.TitleUnicode,
+            {} } });
+        insertion.first->second.Beatmaps.push_back(bm);
+    }
+    return map;
+}
