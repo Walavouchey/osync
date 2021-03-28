@@ -69,7 +69,7 @@ namespace sb
             case Section::Events:
             {
                 applyVariables(line, variables);
-                if (line.find("Sprite") == 0 || line.find("Animation") == 0/* || line.find("Sample") == 0*/) return true;
+                if (line.find("Sprite") == 0 || line.find("Animation") == 0) return true;
             }
             break;
             case Section::Variables:
@@ -78,7 +78,7 @@ namespace sb
                 if (splitPos == std::string::npos || splitPos == line.length() - 1) continue;
                 std::string key = line.substr(0, splitPos);
                 std::string value = line.substr(splitPos + 1, line.length() - splitPos - 1);
-                variables.emplace(key, value); // doesn't overwrite previous values TODO: Check if this is correct behaviour
+                variables.emplace(key, value);
             }
             break;
             }
