@@ -2,17 +2,28 @@
 
 #include <iomanip>
 #include <iostream>
-#include <string>
 #include <sstream>
 
-ProgressBar::ProgressBar(std::string prefix, int denominator, int precision)
+ProgressBar::ProgressBar(std::string prefix, int denominator, int precision, float reportInterval)
     :
     prefix(prefix),
     denominator(denominator),
-    precision(precision)
+    precision(precision),
+    reportInterval(reportInterval)
 {
     print();
     start = std::chrono::steady_clock::now();
+    if (this->reportInterval.count() >= 0) thread = std::thread(&ProgressBar::timer, this);
+}
+
+void ProgressBar::timer()
+{
+    while (!done)
+    {
+        print();
+        std::this_thread::sleep_for(reportInterval);
+    }
+    print();
 }
 
 std::string formatTime(const double t)
@@ -32,19 +43,24 @@ void ProgressBar::print()
 {
     now = std::chrono::steady_clock::now();
     std::chrono::duration<double> elapsed = now - start;
-    std::cout << prefix << numerator << '/' << denominator << ", "
+    std::cout << '\r' << prefix << numerator << '/' << denominator << ", "
         << std::setprecision(precision) << std::fixed
         << 100 * numerator / (float) denominator << "%, elapsed: "
-        << formatTime(elapsed.count()) << ", remaining: ";
-    if (numerator != 0) std::cout << formatTime(elapsed.count() * (denominator / (float) numerator - 1));
-    std::cout << "\r";
+        << formatTime(elapsed.count()) << ", remaining: "
+        << (numerator == 0 ? "" : formatTime(elapsed.count() * (denominator / (float) numerator - 1)));
+}
+
+void ProgressBar::update()
+{
     numerator++;
+    if (reportInterval.count() < 0) print();
 }
 
 void ProgressBar::finish()
 {
-    std::cout << std::endl;
     done = true;
+    if (thread.joinable()) thread.join();
+    std::cout << std::endl;
 }
 
 ProgressBar::~ProgressBar()

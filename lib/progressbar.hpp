@@ -1,21 +1,27 @@
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <string>
+#include <thread>
 
 class ProgressBar
 {
 public:
-    ProgressBar(std::string prefix, int denominator, int precision = 0);
+    ProgressBar(std::string prefix, int denominator, int precision = 0, float reportInterval = -1);
     void print();
+    void update();
     void finish();
     ~ProgressBar();
 private:
+    std::thread thread;
     std::string prefix;
-    int numerator = 0;
+    std::atomic<int> numerator = 0;
     int denominator;
     int precision;
+    std::chrono::duration<float> reportInterval;
     std::chrono::time_point<std::chrono::steady_clock> start;
     std::chrono::time_point<std::chrono::steady_clock> now;
-    bool done = false;
+    std::atomic<bool> done = false;
+    void timer();
 };

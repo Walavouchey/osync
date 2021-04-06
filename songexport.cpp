@@ -33,7 +33,7 @@ int main(int argc, char **argv)
         ProgressBar progress("Files copied: ", sets.size());
         for (auto set : sets)
         {
-            progress.print();
+            progress.update();
             auto beatmap = set.second.Beatmaps[0];
             std::filesystem::path AudioFileName = beatmap.AudioFileName;
             std::filesystem::path FolderName = beatmap.FolderName;
