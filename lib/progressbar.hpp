@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 
 class ProgressBar
@@ -14,5 +15,7 @@ private:
     int numerator = 0;
     int denominator;
     int precision;
+    std::chrono::time_point<std::chrono::steady_clock> start;
+    std::chrono::time_point<std::chrono::steady_clock> now;
     bool done = false;
 };
