@@ -24,10 +24,10 @@ void Beatmapset::Export(const std::filesystem::path &lazerPath, const std::files
 {
     if (!std::filesystem::exists(location))
         throw E("The export path " + location.string() + " doesn't exist");
-    ProgressBar progress = ProgressBar(foldername + ": ", files.size());
+    ProgressBar progress = ProgressBar(foldername + ": ", files.size(), 0, -1, false);
     for (file f : files)
     {
-        progress.print();
+        progress.update();
         if (!f.filename.has_filename()) continue; // could be a directory, which might be a bug in lazer
         std::filesystem::path sourcePath = lazerPath
             / "files"
