@@ -1,18 +1,15 @@
-#include <cfg.hpp>
+#include <tag.h>
+#include <fileref.h>
+#include <tpropertymap.h>
+
 #include <chcp.hpp>
 #include <exc.hpp>
-#include <export.hpp>
-#include <ID3H.hpp>
-#include <lazerdb.hpp>
-#include <Parser.hpp>
-#include <progressbar.hpp>
-#include <stabledb.hpp>
+#include <strext.hpp>
 
 #include <exception>
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include <unordered_set>
 
 
 int main(int argc, char **argv)
@@ -22,11 +19,26 @@ int main(int argc, char **argv)
         UTF8CodePage use_utf8;
         std::filesystem::path filePath;
         if (argc > 1) filePath = std::filesystem::path(argv[1]);
-        else throw E("Must specify a file");
+        else throw std::exception("Must specify a file");
 
-        ID3H handle(filePath.string());
-        for (ID3_Frame *frame : handle.Frames())
-            std::cout << (frame->GetDescription() ? : "") << ": " << handle.GetFieldText(frame) << std::endl;
+        TagLib::FileRef handle(filePath.string().c_str());
+        if (!handle.isNull() && handle.tag())
+        {
+            for(auto tag : handle.file()->properties())
+                for(auto s : tag.second)
+                    std::cout << tag.first << ": " << s.to8Bit(true) << std::endl;
+        }
+        if (!handle.isNull() && handle.audioProperties())
+        {
+            TagLib::AudioProperties *properties = handle.audioProperties();
+
+            std::cout << "BITRATE: " << properties->bitrate() << std::endl;
+            std::cout << "SAMPLE RATE: " << properties->sampleRate() << std::endl;
+            std::cout << "CHANNELS: " << properties->channels() << std::endl;
+            std::cout << "LENGTH: " << strext::formatTime(properties->length()) << std::endl;
+        }
+        if (!handle.isNull() && !handle.tag() && !handle.audioProperties()) throw std::exception("There is nothing to display");
+        if (handle.isNull()) throw std::exception("File couldn't be opened");
     }
     catch (exc e)
     {
