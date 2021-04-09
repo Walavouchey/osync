@@ -1,8 +1,8 @@
+#include <tag.h>
+#include <fileref.h>
+
 #include <cfg.hpp>
 #include <exc.hpp>
-#include <export.hpp>
-#include <lazerdb.hpp>
-#include <Parser.hpp>
 #include <progressbar.hpp>
 #include <stabledb.hpp>
 
@@ -40,7 +40,18 @@ int main(int argc, char **argv)
             std::string newFile = beatmap.Artist + " - " + beatmap.Title + AudioFileName.extension().string();
             sanitizePath(newFile);
             std::filesystem::create_directories(exportLocation);
-            try { std::filesystem::copy(stableFolder / "Songs" / FolderName / AudioFileName, exportLocation / newFile); }
+            std::filesystem::path source = stableFolder / "Songs" / FolderName / AudioFileName;
+            std::filesystem::path destination = exportLocation / newFile;
+            try
+            {
+                std::filesystem::copy(source, destination);
+                TagLib::FileRef handle(destination.string().c_str());
+                std::string artist = beatmap.ArtistUnicode.empty() ? beatmap.Artist : beatmap.ArtistUnicode;
+                std::string title = beatmap.TitleUnicode.empty() ? beatmap.Title : beatmap.TitleUnicode;
+                if (!artist.empty()) handle.tag()->setArtist(TagLib::String(artist, TagLib::String::Type::UTF8));
+                if (!title.empty()) handle.tag()->setTitle(TagLib::String(title, TagLib::String::Type::UTF8));
+                handle.save();
+            }
             catch (...) { /* swallow */ }
         }
     }
