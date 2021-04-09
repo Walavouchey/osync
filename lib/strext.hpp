@@ -7,4 +7,5 @@ namespace strext
 {
     std::string& stringTrim(std::string &s);
     std::vector<std::string> stringSplit(std::string s, const std::string& delimiter, int limit);
+    std::string formatTime(const double t);
 }

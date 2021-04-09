@@ -1,5 +1,8 @@
 #include <strext.hpp>
 
+#include <iomanip>
+#include <sstream>
+
 namespace strext
 {
     std::string& stringTrim(std::string &s)
@@ -17,4 +20,17 @@ namespace strext
         split.emplace_back(s);
         return split;
     } 
+
+    std::string formatTime(const double t)
+    {
+        int ms = t * 1000;
+        int h = ms / (1000 * 60 * 60);
+        ms -= h * (1000 * 60 * 60);
+        int m = ms / (1000 * 60);
+        ms -= m * (1000 * 60);
+        int s = ms / 1000;
+        ms -= s * 1000;
+        return (std::ostringstream() << std::setfill('0') << std::setw(2) << h << ':' << std::setw(2) << m
+            << ':' << std::setw(2) << s << '.' << std::setw(3) << ms).str();
+    }
 }
